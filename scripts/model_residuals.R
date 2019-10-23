@@ -46,6 +46,8 @@ testing_idxs <- split(idx, sort(idx%%n)) # splits the data into n ~equal sized c
 
 testing <- list()
 training <- list()
+# create the testing and training sets
+# and write out keep files to be used with plink
 for(i in 1:n){
   testing[[i]] <- new_dat[ testing_idxs[[i]], ]
   testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(file = here("tmp/",paste0("testing_cv_", i)), col_names = FALSE)
