@@ -1,39 +1,74 @@
+library(here)
+library(fs)
+library(caret)
 library(tidyverse)
-all.dat <- read.csv(file="/media/xsan/staff_groups/merrimanlab/Merriman_Documents/Matt/GP_June/data/curated_data.csv",header=T)
-newpca <- read_delim("/media/xsan/staff_groups/merrimanlab/Merriman_Documents/Matt/GP_June/tmp/pcafile.eigenvec", delim = " ", col_names = F)
+
+# define model type: linear or logistic regression
+model_type <- "linear"
+
+# name of trait column
+trait <- "HEIGHT"
+
+all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
+newpca <- read_delim(file = here("tmp/pcafile.eigenvec"), delim = " ", col_names = F)
 
 ### look at jpoin function, inner or right join
-new.dat <- all.dat %>% left_join(., newpca, by = c("SUBJECT" = "X1")) %>% 
+new_dat <- all_dat %>% left_join(., newpca, by = c("SUBJECT" = "X1")) %>%
   filter(PCAETHBROAD == "Polynesian" | PCAETHBROAD == "West Polynesian" | PCAETHBROAD == "East Polynesian")
 
-new.dat <- all.dat %>% left_join(., newpca, by = c("SUBJECT" = "X1")) %>% 
+new_dat <- all_dat %>% left_join(., newpca, by = c("SUBJECT" = "X1")) %>%
   filter(str_detect(SUBJECT, 'CNP|NPH'))
 
 data(new.dat)
 
 ## create test and training sets
 ## 80% of the sample size
-smp_size <- floor(0.80 * nrow(new.dat))
+smp_size <- floor(0.80 * nrow(new_dat))
 
 ## set the seed to make your partition reproducible
 set.seed(123)
-train_ind <- sample(seq_len(nrow(new.dat)), size = smp_size)
+train_idx <- sample(seq_len(nrow(new_dat)), size = smp_size)
 
-train <- new.dat[train_ind, ]
-test <- new.dat[-train_ind, ]
+train <- new_dat[train_idx, ]
+test <- new_dat[-train_idx, ]
 
-all.dat <- train
+all_dat <- train
 
 
-#models
+# five-fold CV ####
+
+set.seed(42)
+idx <- 1:length(new_dat[["SUBJECT"]])
+idx <- sample(idx, length(idx)) # shuffle up the index
+n <- 5 # how many folds we want
+
+testing_idxs <- split(idx, sort(idx%%n)) # splits the data into n ~equal sized chunks (test sets)
+
+testing <- list()
+training <- list()
+for(i in 1:n){
+  testing[[i]] <- new_dat[ testing_idxs[[i]], ]
+  testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(file = here("tmp/",paste0("testing_cv_", i)), col_names = FALSE)
+  training[[i]] <- new_dat[ -testing_idxs[[i]], ]
+  training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(file = here("tmp/",paste0("training_cv_", i)), col_names = FALSE)
+}
+
+#models ####
+
+model_results<- list()
+for(i in 1:n){
+  model_results[[i]] <- lm(HEIGHT ~ AGECOL, data = training[[i]])
+}
+
+
 
 #sqrt(DIABETES) ~ AGE2 + BMI
 #variates <- c("SEX","AGECOL","AGE2","BMI")
 
-#URATE ~ 
+#URATE ~
 #variates <- c("URATELOWERING","SEX","AGECOL","BMI")
 
-#HEIGHT ~ 
+#HEIGHT ~
 variates <- c("SEX" , "AGECOL")
 
 #EGFRCALC ~ SEX+AGECOL
@@ -47,7 +82,7 @@ variates <- c("SEX" , "AGECOL")
 
 step(lm(HEIGHT ~ SEX+AGECOL+AGE2,data=all.dat),direction="both")
 
-### write models for 0, 2, 4, 6, 8, 10 PCs 
+### write models for 0, 2, 4, 6, 8, 10 PCs
 mod_0 <- lm(HEIGHT ~ SEX + AGECOL, data = all.dat, na.action = na.exclude)
 mod_2 <- lm(HEIGHT ~ X3 +X4 +SEX + AGECOL, data = all.dat, na.action = na.exclude)
 mod_4 <- lm(HEIGHT ~ X3 +X4 +X5 +X6 +SEX + AGECOL, data = all.dat, na.action = na.exclude)
@@ -96,15 +131,15 @@ ggroc <- function(roc, showAUC = TRUE, interval = 0.2, breaks = seq(0, 1, interv
     simpleError("Please provide roc object from pROC package")
   plotx <- rev(roc$specificities)
   ploty <- rev(roc$sensitivities)
-  
+
   ggplot(NULL, aes(x = plotx, y = ploty)) +
-    geom_segment(aes(x = 0, y = 1, xend = 1,yend = 0), alpha = 0.5) + 
+    geom_segment(aes(x = 0, y = 1, xend = 1,yend = 0), alpha = 0.5) +
     geom_step() +
-    scale_x_reverse(name = "Specificity",limits = c(1,0), breaks = breaks, expand = c(0.001,0.001)) + 
+    scale_x_reverse(name = "Specificity",limits = c(1,0), breaks = breaks, expand = c(0.001,0.001)) +
     scale_y_continuous(name = "Sensitivity", limits = c(0,1), breaks = breaks, expand = c(0.001, 0.001)) +
-    theme_bw() + 
+    theme_bw() +
     theme(axis.ticks = element_line(color = "grey80")) +
-    coord_equal() + 
+    coord_equal() +
     annotate("text", x = interval/2, y = interval/2, vjust = 0, label = paste("AUC =",sprintf("%.3f",roc$auc)))
 }
 
