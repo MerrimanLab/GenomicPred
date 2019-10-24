@@ -10,37 +10,23 @@ model_type <- "linear"
 trait <- "HEIGHT"
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
-newpca <- read_delim(file = here("tmp/pcafile.eigenvec"), delim = " ", col_names = F)
+newpca <- read_delim(file = here("tmp/pcafile.eigenvec"), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
 
-### look at jpoin function, inner or right join
-new_dat <- all_dat %>% left_join(., newpca, by = c("SUBJECT" = "X1")) %>%
-  filter(PCAETHBROAD == "Polynesian" | PCAETHBROAD == "West Polynesian" | PCAETHBROAD == "East Polynesian")
+### add the trait information on to the samples in the PCA
+new_dat <- newpca %>% left_join(., all_dat, by = "SUBJECT")
 
-new_dat <- all_dat %>% left_join(., newpca, by = c("SUBJECT" = "X1")) %>%
-  filter(str_detect(SUBJECT, 'CNP|NPH'))
-
-data(new.dat)
 
 ## create test and training sets
-## 80% of the sample size
-smp_size <- floor(0.80 * nrow(new_dat))
+
 
 ## set the seed to make your partition reproducible
-set.seed(123)
-train_idx <- sample(seq_len(nrow(new_dat)), size = smp_size)
-
-train <- new_dat[train_idx, ]
-test <- new_dat[-train_idx, ]
-
-all_dat <- train
-
-
-# five-fold CV ####
+# n-fold CV ####
+n <- 5 # how many folds we want
 
 set.seed(42)
 idx <- 1:length(new_dat[["SUBJECT"]])
 idx <- sample(idx, length(idx)) # shuffle up the index
-n <- 5 # how many folds we want
+
 
 testing_idxs <- split(idx, sort(idx%%n)) # splits the data into n ~equal sized chunks (test sets)
 
@@ -50,17 +36,41 @@ training <- list()
 # and write out keep files to be used with plink
 for(i in 1:n){
   testing[[i]] <- new_dat[ testing_idxs[[i]], ]
-  testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(file = here("tmp/",paste0("testing_cv_", i)), col_names = FALSE)
+  testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0("testing_cv_", i)), col_names = FALSE)
   training[[i]] <- new_dat[ -testing_idxs[[i]], ]
-  training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(file = here("tmp/",paste0("training_cv_", i)), col_names = FALSE)
+  training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0("training_cv_", i)), col_names = FALSE)
 }
+
 
 #models ####
+preds <- c("AGECOL", "SEX", paste0("PC",1:10))
 
-model_results<- list()
-for(i in 1:n){
-  model_results[[i]] <- lm(HEIGHT ~ AGECOL, data = training[[i]])
+# generate
+
+model_results <- list()
+models <- list()
+for(pred_idx in seq_along(preds)){
+  if(pred_idx ==1){
+    # create the base model
+    models <- paste(trait,"~",preds[[pred_idx]])
+  } else{
+    # add the next covariate to the base model
+    models[[pred_idx]] <- paste(model[[pred_idx-1]], preds[[pred_idx]], sep = " + ")
+  }
+  model_results[[pred_idx]] <-c(formula = list(), model = list())
+  # store what the model to be run is
+  model_results[[pred_idx]][["formula"]] <- models[[pred_idx]]
+  # run the model on the data, making sure to use the correct type of regression for the trait
+  # save the results
+  if(model_type == "linear"){
+    model_results[[pred_idx]][["model"]] <- lm(models[[pred_idx]], data = training[[1]], na.action = na.exclude)
+  } else if(model_type == "logistic"){
+    model_results[[pred_idx]]$model <- glm(models[[pred_idx]], family = "binomial", data = training[[1]], na.action = na.exclude)
+  }
+
 }
+
+
 
 
 
