@@ -45,9 +45,8 @@ for(i in 1:n){
 #models ####
 preds <- c("AGECOL", "SEX", paste0("PC",1:10))
 
-# generate
+# generate models
 
-model_results <- list()
 models <- list()
 for(pred_idx in seq_along(preds)){
   if(pred_idx ==1){
@@ -55,42 +54,41 @@ for(pred_idx in seq_along(preds)){
     models <- paste(trait,"~",preds[[pred_idx]])
   } else{
     # add the next covariate to the base model
-    models[[pred_idx]] <- paste(model[[pred_idx-1]], preds[[pred_idx]], sep = " + ")
+    models[[pred_idx]] <- paste(models[[pred_idx-1]], preds[[pred_idx]], sep = " + ")
   }
-  model_results[[pred_idx]] <-c(formula = list(), model = list())
-  # store what the model to be run is
-  model_results[[pred_idx]][["formula"]] <- models[[pred_idx]]
-  # run the model on the data, making sure to use the correct type of regression for the trait
-  # save the results
-  if(model_type == "linear"){
-    model_results[[pred_idx]][["model"]] <- lm(models[[pred_idx]], data = training[[1]], na.action = na.exclude)
-  } else if(model_type == "logistic"){
-    model_results[[pred_idx]]$model <- glm(models[[pred_idx]], family = "binomial", data = training[[1]], na.action = na.exclude)
-  }
-
 }
 
+# for a given formula run the model as either linear or logistic regression
+run_model <- function(model_formula, dat){
+  model_results <- list()
+  if(model_type == "linear"){
+    model_results[["model"]] <- lm(model_formula, data = dat, na.action = na.exclude)
+  } else if(model_type == "logistic"){
+    model_results[["model"]] <- glm(model_formula, family = "binomial", data = dat, na.action = na.exclude)
+  }
+  model_results[["formula"]] <- model_formula
+  return(model_results)
+}
+
+# test example
+#run_model(model_formula = models[[1]], training[[1]])
+
+# run the set of models on a training set
+run_cv <- function(training_set){
+  model_results <- purrr::map(models, run_model, training_set) %>% set_names(., nm =  paste0("model",seq_along(models)))
+  #names(model_results) <- paste0("model",seq_along(models))
+  return(model_results)
+}
+
+# run all the training sets for all of the models
+cv_results <- purrr::map(training, ~run_cv(.x) ) %>% set_names(paste0("cv", seq_along(training)))
 
 
 
 
-#sqrt(DIABETES) ~ AGE2 + BMI
-#variates <- c("SEX","AGECOL","AGE2","BMI")
 
-#URATE ~
-#variates <- c("URATELOWERING","SEX","AGECOL","BMI")
 
-#HEIGHT ~
-variates <- c("SEX" , "AGECOL")
 
-#EGFRCALC ~ SEX+AGECOL
-#variates <- c("SEX" , "AGECOL")
-
-#BMI ~ SEX + AGECOL + AGE2
-#variates <- c("SEX","AGECOL","AGE2")
-
-#GOUT ~ SEX + AGECOL + AGE2 + BMI
-#variates <- c( "SEX" , "AGECOL" , "AGE2" , "BMI")
 
 step(lm(HEIGHT ~ SEX+AGECOL+AGE2,data=all.dat),direction="both")
 
