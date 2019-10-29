@@ -2,14 +2,55 @@ library(here)
 library(fs)
 library(tidyverse)
 
-# define model type: linear or logistic regression
-model_type <- "linear"
+library("optparse")
+
+option_list = list(
+  make_option(c("--trait"), type="character", default=NULL,
+              help="Name of trait column that matches exactly from the phenotype file", metavar="character"),
+  make_option(c("-r", "--regression"), type="character", default="linear",
+              help="linear|logistic", metavar="character"),
+  make_option(c("-p","--pop"), type = "character", default=NULL,
+              help="Name of the population (no special characters except underscore).", metavar="character")
+);
+
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
+
 
 # name of trait column
-trait <- "HEIGHT"
+#trait <- "HEIGHT"
+if (is.null(opt$trait)){
+  print_help(opt_parser)
+  stop("Trait argument must be supplied.", call.=FALSE)
+} else {
+  trait <- opt$trait
+}
+
+
+# define model type: linear or logistic regression
+#model_type <- "linear"
+if(!(opt$regression == "linear" | opt$regression ==  "logistic")){
+  print_help(opt_parser)
+  stop("Regression argument must be 'linear' or 'logistic'.", call.=FALSE)
+} else {
+  model_type <- opt$regression
+}
+
+# population name
+if(is.null(opt$pop)){
+  print_help(opt_parser)
+  stop("Population (pop) argument must be supplied.", call.=FALSE)
+} else {
+  pop <- opt$pop
+}
+
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
-newpca <- read_delim(file = here("tmp/pcafile.eigenvec"), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
+newpca <- read_delim(file = here(pop,"pcafile.eigenvec"), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
+
+if (!trait %in% names(all_dat)){
+  stop("Trait argument supplied does not match a column in the phenotypes.", call.=FALSE)
+}
 
 ### add the trait information on to the samples in the PCA
 new_dat <- newpca %>% left_join(., all_dat, by = "SUBJECT")
@@ -93,11 +134,11 @@ get_residuals_df <- function(dat){
 cv_residuals <- map(cv_results, ~get_residuals_df(.x))
 
 # write out each cv residuals with the subject and trait
-walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here("tmp",paste0("residuals_",.x,".txt")), delim = " ", col_names = FALSE))
+walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here(pop,paste0("residuals_",.x,".txt")), delim = " ", col_names = FALSE))
 
 
 
-
+saveRDS(list(cv_results = cv_results, trait, model_type, models, preds, testing, training), file = here("results",paste0(pop,"_",trait,".RDS")))
 
 
 # Old Matt code below here ####
