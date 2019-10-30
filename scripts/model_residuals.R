@@ -48,7 +48,7 @@ if(is.null(opt$pop)){
 
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
-newpca <- read_delim(file = here("tmp",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
+newpca <- read_delim(file = here("results",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
 
 if (!trait %in% names(all_dat)){
   stop("Trait argument supplied does not match a column in the phenotypes.", call.=FALSE)
