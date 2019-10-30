@@ -14,6 +14,6 @@ plink2 --bfile data/data --keep data/keep${POP}.txt --maf 0.01 --geno 0.05 --mak
 software/gcta64 --bfile tmp/${POP}_sorteddata --autosome --make-grm --out results/${POP}_gcta_grm
 
 ######################## PCAs
-### calculate principal components for the population
-plink2 --bfile tmp/${POP}_sorteddata --pca 10 --out results/${POP}_pcafile
+### calculate principal components for the population using the independent markers
+plink2 --bfile tmp/${POP}_sorteddata --pca 10 --out results/${POP}_pcafile --extract data/data_pca_markers.indep.in
 
