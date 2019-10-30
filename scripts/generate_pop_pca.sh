@@ -15,5 +15,5 @@ software/gcta64 --bfile tmp/${POP}_sorteddata --autosome --make-grm --out result
 
 ######################## PCAs
 ### calculate principal components for the population
-plink2 --bfile tmp/sorteddata --pca 10 --out results/${POP}_pcafile
+plink2 --bfile tmp/${POP}_sorteddata --pca 10 --out results/${POP}_pcafile
 
