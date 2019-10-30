@@ -23,3 +23,4 @@ parallel 'run_gcta.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_model
 parallel 'run_ldak.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
 parallel 'run_bayesR.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
 
+
