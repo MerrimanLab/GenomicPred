@@ -10,7 +10,7 @@ if(!require(tidyverse)){
   install.packages("tidyverse", repos = "https://cloud.r-project.org")
   library(tidyverse)
 }
-if(!require(optparse){
+if(!require(optparse)){
   install.packages("optparse", repos = "https://cloud.r-project.org")   
   library("optparse")
 }
