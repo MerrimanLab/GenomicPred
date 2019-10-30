@@ -1,8 +1,20 @@
-library(here)
-library(fs)
-library(tidyverse)
+if(!require(here)){
+  install.packages("here", repos = "https://cloud.r-project.org")
+  library("here")
+}
+if(!require(fs)){
+  install.packages("fs", repos = "https://cloud.r-project.org")
+  library(fs)
+}
+if(!require(tidyverse)){
+  install.packages("tidyverse", repos = "https://cloud.r-project.org")
+  library(tidyverse)
+}
+if(!require(optparse){
+  install.packages("optparse", repos = "https://cloud.r-project.org")   
+  library("optparse")
+}
 
-library("optparse")
 
 option_list = list(
   make_option(c("--trait"), type="character", default=NULL,
@@ -12,7 +24,9 @@ option_list = list(
   make_option(c("-p","--pop"), type = "character", default=NULL,
               help="Name of the population (no special characters except underscore).", metavar="character"),
   make_option(c("--out_dir"), type = "character", default = "results",
-              help = "Name of the directory to store the results (no trailing slash needed).")
+              help = "Name of the directory to store the results (no trailing slash needed)."),
+  make_option(c("--cv"), type="numeric",default = 5,
+	      help = "Number of cross-validations to perform (default = 5)")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -46,6 +60,9 @@ if(is.null(opt$pop)){
   pop <- opt$pop
 }
 
+# cv folds
+cv_n <- opt$cv 
+
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
 newpca <- read_delim(file = here("results",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
@@ -63,7 +80,7 @@ new_dat <- newpca %>% left_join(., all_dat, by = "SUBJECT")
 
 ## set the seed to make your partition reproducible
 # n-fold CV ####
-n <- 5 # how many folds we want
+#n <- 5 # how many folds we want
 
 set.seed(42)
 idx <- 1:length(new_dat[["SUBJECT"]])
@@ -76,14 +93,14 @@ testing <- list()
 training <- list()
 # create the testing and training sets
 # and write out keep files to be used with plink
-for(i in 1:n){
+for(i in 1:cv_n){
   testing[[i]] <- new_dat[ testing_idxs[[i]], ]
   testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_testing_cv_", i)), col_names = FALSE)
   training[[i]] <- new_dat[ -testing_idxs[[i]], ]
   training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_training_cv_", i)), col_names = FALSE)
 }
-names(training) <- paste0("cv",1:n)
-names(testing) <- paste0("cv",1:n)
+names(training) <- paste0("cv",seq_along(training))
+names(testing) <- paste0("cv",seq_along(training))
 
 #models ####
 preds <- c("AGECOL", "SEX", paste0("PC",1:10))
