@@ -10,7 +10,9 @@ option_list = list(
   make_option(c("-r", "--regression"), type="character", default="linear",
               help="linear|logistic", metavar="character"),
   make_option(c("-p","--pop"), type = "character", default=NULL,
-              help="Name of the population (no special characters except underscore).", metavar="character")
+              help="Name of the population (no special characters except underscore).", metavar="character"),
+  make_option(c("--out_dir"), type = "character", default = "results",
+              help = "Name of the directory to store the results (no trailing slash needed).")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -46,7 +48,7 @@ if(is.null(opt$pop)){
 
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
-newpca <- read_delim(file = here(pop,"pcafile.eigenvec"), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
+newpca <- read_delim(file = here("tmp",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)))
 
 if (!trait %in% names(all_dat)){
   stop("Trait argument supplied does not match a column in the phenotypes.", call.=FALSE)
@@ -76,9 +78,9 @@ training <- list()
 # and write out keep files to be used with plink
 for(i in 1:n){
   testing[[i]] <- new_dat[ testing_idxs[[i]], ]
-  testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0("testing_cv_", i)), col_names = FALSE)
+  testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_testing_cv_", i)), col_names = FALSE)
   training[[i]] <- new_dat[ -testing_idxs[[i]], ]
-  training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0("training_cv_", i)), col_names = FALSE)
+  training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_training_cv_", i)), col_names = FALSE)
 }
 names(training) <- paste0("cv",1:n)
 names(testing) <- paste0("cv",1:n)
@@ -134,11 +136,11 @@ get_residuals_df <- function(dat){
 cv_residuals <- map(cv_results, ~get_residuals_df(.x))
 
 # write out each cv residuals with the subject and trait
-walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here(pop,paste0("residuals_",.x,".txt")), delim = " ", col_names = FALSE))
+walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here("tmp",paste0(pop,"_",trait,"_residuals_",.x,".txt")), delim = " ", col_names = FALSE))
 
 
 
-saveRDS(list(cv_results = cv_results, trait, model_type, models, preds, testing, training), file = here("results",paste0(pop,"_",trait,".RDS")))
+saveRDS(list(cv_results = cv_results, trait, model_type, models, preds, testing, training), file = here(opt$out_dir,paste0(pop,"_",trait,".RDS")))
 
 
 # Old Matt code below here ####
