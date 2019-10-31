@@ -153,7 +153,7 @@ get_residuals_df <- function(dat){
 cv_residuals <- map(cv_results, ~get_residuals_df(.x))
 
 # write out each cv residuals with the subject and trait
-walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here("tmp",paste0(pop,"_",trait,"_",.x,"_residuals_",".txt")), delim = " ", col_names = FALSE))
+walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here("tmp",paste0(pop,"_",trait,"_training_",.x,"_residuals",".txt")), delim = " ", col_names = FALSE))
 
 
 
