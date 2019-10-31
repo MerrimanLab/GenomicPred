@@ -4,6 +4,7 @@ POP=$(echo $BFILE | cut -d'_' -f1)
 TRAIT=$(echo $BFILE | cut -d'_' -f2)
 CV=$(echo $BFILE | cut -d'_' -f4)
 MODEL=$2
+TEST=${POP}_${TRAIT}_testing_${CV}
 DIR=results/${POP}_${TRAIT}
 
 ######################## GCTA
@@ -21,7 +22,7 @@ software/gcta64 --reml-pred-rand --grm results/${POP}_gcta_grm --pheno tmp/${BFI
 ### parallel "software/gcta64 --reml-pred-rand --grm $DIR/GCTA/grm --pheno tmp/traindata.fam --mpheno {} --prevalence 0.1 --out $DIR/GCTA/$TRAIT{1}" ::: $(seq 1 7)
 
 # BLUP solutions for the SNP effects
-#plink1.9b6.10 --bfile data/data --keep tmp/$BFILE --maf 0.01 --geno 0.05 --make-bed --out tmp/$BFILE
+plink1.9b6.10 --bfile data/data --keep tmp/$TEST --maf 0.01 --geno 0.05 --make-bed --out tmp/$TEST
 software/gcta64 --bfile tmp/$BFILE --blup-snp $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.indi.blp --autosome --out $DIR/GCTA/${TRAIT}_${CV}_${MODEL}
 
 # Then use plink --score $DIR/GCTA/height1.snp.blp 1 2 3 to do the prediction on the test set, ie bfile for the test set
