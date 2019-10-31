@@ -6,14 +6,14 @@ mkdir -p tmp results
 software/plink1.9b6.10 --bfile data/data --indep-pairwise 50 5 0.2 --maf 0.1 --out data/data_pca_markers
 
 # create the PCAs for the pops of interest
-parallel 'bash scripts/generate_pop_pca.sh {}' ::: nph #east west euro 
+parallel 'bash scripts/generate_pop_pca.sh {}' ::: nph east west euro 
 
 
 # create the cv splits and residuals for all pops and trait combos
 
 CV=5 # number fo folds for cross validation
 
-for POP in nph #east west euro 
+for POP in nph east west euro 
 do
 	while read line
 	do
