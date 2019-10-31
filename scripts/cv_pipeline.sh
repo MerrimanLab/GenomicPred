@@ -36,9 +36,9 @@ done
 parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep -v 'residuals')
 
 
-# run bayesR, GCTA and LDAK for each combo and all CVs
+# run bayesR, GCTA and LDAK for each combo and all
 
-parallel 'bash scripts/run_gcta.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d',' -f1 | tr "\n" " ")
+parallel 'bash scripts/run_gcta.sh {1} {2}' ::: $(ls tmp/*training_cv*.fam) ::: $(seq 1 7)
 parallel 'bash scripts/run_ldak.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d ',' -f1 | tr "\n" " ")
 parallel 'bash scripts/run_bayesR.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d',' -f1 | tr "\n" " ")
 
