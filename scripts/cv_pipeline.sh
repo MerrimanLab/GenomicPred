@@ -1,5 +1,7 @@
 mkdir -p tmp results
 
+# create lise of independent SNPs from data
+plink2 --bfile data/data --indep-pairwise 50 5 0.2 --maf 0.1 --out data/data_pca_markers
 
 # create the PCAs for the pops of interest
 parallel 'bash scripts/generate_pop_pca.sh {}' ::: nph east west euro 
@@ -13,9 +15,9 @@ for POP in nph east west euro
 do
 	while read line
 	do
-		TRAIT=$(echo $line | cut -f1)
-		REGRESSION_TYPE=$(echo $line | cut -f2)
-		bash generate_models.sh ${POP} ${TRAIT} ${REGRESSION_TYPE} ${CV}
+		TRAIT=$(echo $line | cut -d',' -f1)
+		REGRESSION_TYPE=$(echo $line | cut -d',' -f2)
+		bash scripts/generate_models.sh ${POP} ${TRAIT} ${REGRESSION_TYPE} ${CV}
 	done < data/pop_trait_models.txt
 done
 
