@@ -31,13 +31,15 @@ done
 # height, egfr, serumurate, diabetes and gout in that order
 
 
+# creates the training subsets and joins the residuals to make the new fam file.
+# if needed to rerun make sure to do "rm tmp/*cv*.{bed,bim,fam,log,nosex}" first
 parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep -v 'residuals')
 
 
 # run bayesR, GCTA and LDAK for each combo and all CVs
 
-parallel 'run_gcta.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
-parallel 'run_ldak.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
-parallel 'run_bayesR.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
+parallel 'bash scripts/run_gcta.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d',' -f1 | tr "\n" " ")
+parallel 'bash scripts/run_ldak.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d ',' -f1 | tr "\n" " ")
+parallel 'bash scripts/run_bayesR.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d',' -f1 | tr "\n" " ")
 
 
