@@ -95,9 +95,9 @@ training <- list()
 # and write out keep files to be used with plink
 for(i in 1:cv_n){
   testing[[i]] <- new_dat[ testing_idxs[[i]], ]
-  testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_testing_cv_", i)), col_names = FALSE)
+  testing[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_testing_cv", i)), col_names = FALSE)
   training[[i]] <- new_dat[ -testing_idxs[[i]], ]
-  training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_training_cv_", i)), col_names = FALSE)
+  training[[i]] %>% select(SUBJECT) %>% mutate(SUBJECT1 = SUBJECT) %>% write_delim(path = here("tmp/",paste0(pop,"_",trait,"_training_cv", i)), col_names = FALSE)
 }
 names(training) <- paste0("cv",seq_along(training))
 names(testing) <- paste0("cv",seq_along(training))
@@ -153,7 +153,7 @@ get_residuals_df <- function(dat){
 cv_residuals <- map(cv_results, ~get_residuals_df(.x))
 
 # write out each cv residuals with the subject and trait
-walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here("tmp",paste0(pop,"_",trait,"_residuals_",.x,".txt")), delim = " ", col_names = FALSE))
+walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here("tmp",paste0(pop,"_",trait,"_",.x"_residuals_",".txt")), delim = " ", col_names = FALSE))
 
 
 
