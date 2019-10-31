@@ -1,5 +1,6 @@
 data/
 software/
 tmp/
+results/
 *.RDS
 .Rproj.user
