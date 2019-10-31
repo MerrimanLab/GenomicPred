@@ -22,9 +22,9 @@ software/gcta64 --reml-pred-rand --grm results/${POP}_gcta_grm --pheno tmp/${BFI
 
 # BLUP solutions for the SNP effects
 #plink1.9b6.10 --bfile data/data --keep tmp/$BFILE --maf 0.01 --geno 0.05 --make-bed --out tmp/$BFILE
-#parallel "software/gcta64 --bfile tmp/$BFILE --blup-snp $DIR/GCTA/$TRAIT{}.indi.blp --autosome --out $DIR/GCTA/$TRAIT{}" ::: $(seq 1 7)
+software/gcta64 --bfile tmp/$BFILE --blup-snp $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.indi.blp --autosome --out $DIR/GCTA/${TRAIT}_${CV}_${MODEL}
 
 # Then use plink --score $DIR/GCTA/height1.snp.blp 1 2 3 to do the prediction on the test set, ie bfile for the test set
-#parallel "plink1.9b6.10 --bfile tmp/${POP}_${TRAIT}_testing_${CV} --score $DIR/GCTA/$TRAIT{}.snp.blp 1 2 3 --out $DIR/GCTA/$TRAIT{}" ::: $(seq 1 7)
+plink1.9b6.10 --bfile tmp/${POP}_${TRAIT}_testing_${CV} --score $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.snp.blp 1 2 3 --out $DIR/GCTA/${TRAIT}_${CV}_${MODEL}
 
 
