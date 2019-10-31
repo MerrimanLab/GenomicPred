@@ -6,7 +6,7 @@ POP=$1
 
 ### sort and keep our population
 mkdir -p tmp
-plink2 --bfile data/data --keep data/keep${POP}.txt --maf 0.01 --geno 0.05 --make-bed --out tmp/${POP}_sorteddata
+plink1.9b6.10 --bfile data/data --keep data/keep${POP}.txt --maf 0.01 --geno 0.05 --make-bed --out tmp/${POP}_sorteddata
 
 ######################## GCTA
 #grm
@@ -15,5 +15,5 @@ software/gcta64 --bfile tmp/${POP}_sorteddata --autosome --make-grm --out result
 
 ######################## PCAs
 ### calculate principal components for the population using the independent markers
-plink2 --bfile tmp/${POP}_sorteddata --pca 10 --out results/${POP}_pcafile --extract data/data_pca_markers.prune.in
+plink1.9b6.10 --bfile tmp/${POP}_sorteddata --pca 10 --out results/${POP}_pcafile --extract data/data_pca_markers.prune.in
 

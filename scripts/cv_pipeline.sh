@@ -1,7 +1,7 @@
 mkdir -p tmp results
 
 # create lise of independent SNPs from data
-plink2 --bfile data/data --indep-pairwise 50 5 0.2 --maf 0.1 --out data/data_pca_markers
+plink1.9b6.10 --bfile data/data --indep-pairwise 50 5 0.2 --maf 0.1 --out data/data_pca_markers
 
 # create the PCAs for the pops of interest
 parallel 'bash scripts/generate_pop_pca.sh {}' ::: nph east west euro 
