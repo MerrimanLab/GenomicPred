@@ -87,7 +87,7 @@ idx <- 1:length(new_dat[["SUBJECT"]])
 idx <- sample(idx, length(idx)) # shuffle up the index
 
 
-testing_idxs <- split(idx, sort(idx%%n)) # splits the data into n ~equal sized chunks (test sets)
+testing_idxs <- split(idx, sort(idx%%cv_n)) # splits the data into n ~equal sized chunks (test sets)
 
 testing <- list()
 training <- list()
