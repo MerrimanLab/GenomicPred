@@ -31,14 +31,16 @@ done
 # height, egfr, serumurate, diabetes and gout in that order
 
 
-for cv_training in ${POP}_${TRAIT}_training_cv*
+for cv_training in $(ls tmp/*_training_cv* | grep -v 'residuals')
 do
-	plink2 --bfile data/data --keep $cv_training --make-bed --out $cv_training
-	join -1 1 -2 1 -o 1.1 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 -e "NA" <(sort -k 1 tmp/$cv_training.fam) <(sort -k 1 tmp/${cv_training}_residuals.txt) > dummy
+	cv_training=$(basename $cv_training)
+	plink2 --bfile data/data --keep tmp/${cv_training} --make-bed --out tmp/${cv_training}
+	join -1 1 -2 1 -o 1.1 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 -e "NA" <(sort -k 1 tmp/${cv_training}.fam) <(sort -k 1 tmp/${cv_training}_residuals.txt) > dummy
 	mv tmp/${cv_training}.fam tmp/${cv_training}.fam.bak
 	mv dummy tmp/${cv_training}.fam
 done
 
+parallel 'bash fam_residual_alter.sh {}' ::: $(ls tmp/*_training_cv* | grep -v 'residuals')
 
 
 
