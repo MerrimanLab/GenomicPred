@@ -40,7 +40,7 @@ do
 	mv dummy tmp/${cv_training}.fam
 done
 
-parallel 'bash fam_residual_alter.sh {}' ::: $(ls tmp/*_training_cv* | grep -v 'residuals')
+parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep -v 'residuals')
 
 
 
