@@ -15,5 +15,5 @@ software/gcta64 --bfile tmp/${POP}_sorteddata --autosome --make-grm --out result
 
 ######################## PCAs
 ### calculate principal components for the population using the independent markers
-plink2 --bfile tmp/${POP}_sorteddata --pca 10 --out results/${POP}_pcafile --extract data/data_pca_markers.indep.in
+plink2 --bfile tmp/${POP}_sorteddata --pca 10 --out results/${POP}_pcafile --extract data/data_pca_markers.prune.in
 
