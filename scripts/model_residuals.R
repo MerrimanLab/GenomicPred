@@ -11,7 +11,7 @@ if(!require(tidyverse)){
   library(tidyverse)
 }
 if(!require(optparse)){
-  install.packages("optparse", repos = "https://cloud.r-project.org")   
+  install.packages("optparse", repos = "https://cloud.r-project.org")
   library("optparse")
 }
 
@@ -61,7 +61,7 @@ if(is.null(opt$pop)){
 }
 
 # cv folds
-cv_n <- opt$cv 
+cv_n <- opt$cv
 
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
@@ -146,18 +146,23 @@ cv_results <- purrr::map(training, ~run_cv(.x) ) %>% set_names(paste0("cv", seq_
 
 # funcntion to return the residuals from a cv model
 get_residuals_df <- function(dat){
-  return(map_dfc(dat, "residuals"))
+  res <- list()
+  res$residuals <- map(dat, list("model","residuals"))
+  res$remove <- map(dat, list("model","na.action"))
+  #res <- map(names(res), ~ bind_cols(res[[.x]])  )
+  return(res)
 }
 
 # put the residuals from all models into a dataframe for each cv
 cv_residuals <- map(cv_results, ~get_residuals_df(.x))
 
-# write out each cv residuals with the subject and trait
-walk(names(cv_residuals), ~write_delim(bind_cols(select(training[[.x]], SUBJECT, !!trait),cv_residuals[[.x]]), path = here("tmp",paste0(pop,"_",trait,"_training_",.x,"_residuals",".txt")), delim = " ", col_names = FALSE))
 
+# write out each cv residuals with the subject and trait
+walk(names(cv_residuals), ~write_delim(bind_cols((select(training[[.x]], SUBJECT, !!trait)) %>% slice(-unlist(cv_residuals[[.x]][["remove"]])), bind_cols(cv_residuals[[.x]][["residuals"]])), path = here("tmp",paste0(pop,"_",trait,"_training_",.x,"_residuals",".txt")), delim = " ", col_names = FALSE))
 
 
 saveRDS(list(cv_results = cv_results, trait, model_type, models, preds, testing, training), file = here(opt$out_dir,paste0(pop,"_",trait,".RDS")))
+
 
 
 # Old Matt code below here ####
