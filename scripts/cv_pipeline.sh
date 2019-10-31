@@ -1,3 +1,5 @@
+echo "START"
+date
 mkdir -p tmp results
 
 # create lise of independent SNPs from data
@@ -44,6 +46,8 @@ pheno_cols=$(for cv_residuals in tmp/*residuals.txt; do  head -1 $cv_residuals |
 parallel 'bash scripts/run_gcta.sh {1} {2}' ::: $(ls tmp/*training_cv*.fam) ::: ${pheno_cols} 
 parallel 'bash scripts/ldak_weights.sh {1}' :::  $(ls tmp/*training_cv*.fam) 
 parallel 'bash scripts/run_ldak.sh {1} {2} ' :::  $(ls tmp/*training_cv*.fam) ::: ${pheno_cols}
-#parallel 'bash scripts/run_bayesR.sh {1} {2} ' ::: $(ls tmp/*training_cv*.fam) ::: ${pheno_cols}
+parallel 'bash scripts/run_bayesR.sh {1} {2} ' ::: $(ls tmp/*training_cv*.fam) ::: ${pheno_cols}
 
+echo "FINISH"
+date
 

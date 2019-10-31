@@ -4,6 +4,7 @@ POP=$(echo $BFILE | cut -d'_' -f1)
 TRAIT=$(echo $BFILE | cut -d'_' -f2)
 CV=$(echo $BFILE | cut -d'_' -f4)
 MODEL=$2
+PHENOCOL=$(echo $MODEL + 4 | bc)
 TEST=${POP}_${TRAIT}_testing_${CV}
 DIR=results/${POP}_${TRAIT}
 REGRESSION=$(grep -w "$TRAIT" data/pop_trait_models.csv | cut -d',' -f2)
@@ -19,7 +20,7 @@ echo "****** $REGRESSION ******"
 #reml
 # $(seq 1 to how many trait/residual columns 
 #software/gcta64 --reml --grm results/${POP}_gcta_grm --pheno tmp/${BFILE}.fam --mpheno $MODEL --prevalence 0.15 --out $DIR/GCTA/${TRAIT}_${CV}_${MODEL}
-software/gcta64 --reml --reml-pred-rand --grm results/${POP}_gcta_grm --pheno tmp/${BFILE}.pheno --mpheno ${MODEL} --out ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}
+software/gcta64 --reml --reml-pred-rand --grm results/${POP}_gcta_grm --pheno tmp/${BFILE}.pheno --mpheno ${PHENOCOL} --out ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}
 
 
 ### One GRM (case-control studies)
