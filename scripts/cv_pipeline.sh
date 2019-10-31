@@ -31,6 +31,8 @@ done
 # height, egfr, serumurate, diabetes and gout in that order
 
 
+# creates the training subsets and joins the residuals to make the new fam file.
+# if needed to rerun make sure to do "rm tmp/*cv*.{bed,bim,fam,log,nosex}" first
 parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep -v 'residuals')
 
 
