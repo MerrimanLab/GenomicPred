@@ -1,6 +1,7 @@
-POP=$(echo $1 | cut -d'_' -f1)
-TRAIT=$(echo $1 | cut -d'_' -f2)
+
 BFILE=$(basename $1 .fam)
+POP=$(echo $BFILE | cut -d'_' -f1)
+TRAIT=$(echo $BFILE | cut -d'_' -f2)
 CV=$(echo $BFILE | cut -d'_' -f4)
 MODEL=$2
 DIR=results/${POP}_${TRAIT}
