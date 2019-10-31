@@ -18,7 +18,7 @@ do
 		TRAIT=$(echo $line | cut -d',' -f1)
 		REGRESSION_TYPE=$(echo $line | cut -d',' -f2)
 		bash scripts/generate_models.sh ${POP} ${TRAIT} ${REGRESSION_TYPE} ${CV}
-	done < data/pop_trait_models.txt
+	done < data/pop_trait_models.csv
 done
 
 
@@ -29,6 +29,18 @@ done
 # this step need to be repeated for each of the groups at bayesR section
 # columns 8-12 are the FIVE residuals
 # height, egfr, serumurate, diabetes and gout in that order
+
+
+for cv_training in ${POP}_${TRAIT}_training_cv*
+do
+	plink2 --bfile data/data --keep $cv_training --make-bed --out $cv_training
+	join -1 1 -2 1 -o 1.1 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 -e "NA" <(sort -k 1 tmp/$cv_training.fam) <(sort -k 1 tmp/${cv_training}_residuals.txt) > dummy
+	mv tmp/${cv_training}.fam tmp/${cv_training}.fam.bak
+	mv dummy tmp/${cv_training}.fam
+done
+
+
+
 
 
 cat tmp/${POP}_${TRAIT}_residuals.csv | awk '{ print($1, $1)}' > tmp/trainfile.txt
