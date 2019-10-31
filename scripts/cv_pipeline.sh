@@ -31,27 +31,8 @@ done
 # height, egfr, serumurate, diabetes and gout in that order
 
 
-for cv_training in $(ls tmp/*_training_cv* | grep -v 'residuals')
-do
-	cv_training=$(basename $cv_training)
-	plink2 --bfile data/data --keep tmp/${cv_training} --make-bed --out tmp/${cv_training}
-	join -1 1 -2 1 -o 1.1 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 -e "NA" <(sort -k 1 tmp/${cv_training}.fam) <(sort -k 1 tmp/${cv_training}_residuals.txt) > dummy
-	mv tmp/${cv_training}.fam tmp/${cv_training}.fam.bak
-	mv dummy tmp/${cv_training}.fam
-done
-
 parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep -v 'residuals')
 
-
-
-
-cat tmp/${POP}_${TRAIT}_residuals.csv | awk '{ print($1, $1)}' > tmp/trainfile.txt
-# check order of filtering ie maf, geno, people
-plink2 --bfile data/data --keep tmp/trainfile.txt --make-bed --out tmp/traindata
-
-join -1 1 -2 1 -o 1.1 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 -e "NA" <(sort -k 1 tmp/traindata.fam) <(sort -k 1 tmp/residuals.csv) > dummy
-
-mv dummy tmp/traindata.fam
 
 # run bayesR, GCTA and LDAK for each combo and all CVs
 
