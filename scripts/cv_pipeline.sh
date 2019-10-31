@@ -36,8 +36,8 @@ parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep
 
 # run bayesR, GCTA and LDAK for each combo and all CVs
 
-parallel 'run_gcta.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
-parallel 'run_ldak.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
-parallel 'run_bayesR.sh {1} {2} ' ::: nph east west euro ::: $(cat pop_trait_models.txt | cut -f1 | tr "\n" " ")
+parallel 'bash scripts/run_gcta.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d',' -f1 | tr "\n" " ")
+parallel 'bash scripts/run_ldak.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d ',' -f1 | tr "\n" " ")
+parallel 'bash scripts/run_bayesR.sh {1} {2} ' ::: nph east west euro ::: $(cat data/pop_trait_models.csv | cut -d',' -f1 | tr "\n" " ")
 
 
