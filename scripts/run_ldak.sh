@@ -16,4 +16,4 @@ software/LDAK/ldak5.linux --reml $DIR/LDAK/${TRAIT}_${CV}_${MODEL} --pheno tmp/$
 ### blups
 software/LDAK/ldak5.linux --calc-blups $DIR/LDAK/${TRAIT}_${CV}_${MODEL} --remlfile $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.reml --grm $DIR/LDAK/${TRAIT}_${CV}_kinships --bfile tmp/${BFILE} --check-root NO
 
-
+### needs an apply step to the testing set

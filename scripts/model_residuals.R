@@ -64,7 +64,7 @@ if(is.null(opt$pop)){
 cv_n <- opt$cv
 
 
-all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE)
+all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE) %>% mutate(GOUT01recode = GOUT -1, T2D01recode = T2D -1)
 newpca <- read_delim(file = here("results",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)), col_types = paste0(c("c","c",rep("d", 10)),collapse = ""))
 
 if (!trait %in% names(all_dat)){

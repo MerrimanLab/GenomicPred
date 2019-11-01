@@ -43,10 +43,10 @@ parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep
 # calculate the column indexs from all of the residuals -> should be equal to $(seq 1 number_of_models)
 pheno_cols=$(for cv_residuals in tmp/*residuals.txt; do  head -1 $cv_residuals | awk '{ for(i=1;i<=NF-2;i++){print i}}' ; done | sort -u)
 
-parallel 'bash scripts/run_gcta.sh {1} {2}' ::: $(ls tmp/*training_cv*.fam) ::: ${pheno_cols} 
-parallel 'bash scripts/ldak_weights.sh {1}' :::  $(ls tmp/*training_cv*.fam) 
-parallel 'bash scripts/run_ldak.sh {1} {2} ' :::  $(ls tmp/*training_cv*.fam) ::: ${pheno_cols}
-parallel 'bash scripts/run_bayesR.sh {1} {2} ' ::: $(ls tmp/*training_cv*.fam) ::: ${pheno_cols}
+parallel 'bash scripts/run_gcta.sh {1} {2}' ::: $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols} 
+parallel 'bash scripts/ldak_weights.sh {1}' :::  $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') 
+parallel 'bash scripts/run_ldak.sh {1} {2} ' :::  $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols}
+parallel 'bash scripts/run_bayesR.sh {1} {2} ' ::: $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols}
 
 echo "FINISH"
 date
