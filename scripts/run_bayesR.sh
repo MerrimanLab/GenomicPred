@@ -16,7 +16,7 @@ REGRESSION=$(grep -w "$TRAIT" data/pop_trait_models.csv | cut -d',' -f2)
 cp tmp/${BFILE}.pheno tmp/${BFILE}_${MODEL}.fam
 cp tmp/${BFILE}.bed tmp/${BFILE}_${MODEL}.bed
 cp tmp/${BFILE}.bim tmp/${BFILE}_${MODEL}.bim
-software/bayesR/bin/bayesR -bfile tmp/${BFILE}_${MODEL} -out $DIR/bayesR/${TRAIT}_${CV}_${MODEL} -numit 1000 -burnin 200 -n $PHENOCOL -seed 333
+software/bayesR/bin/bayesR -bfile tmp/${BFILE}_${MODEL} -out $DIR/bayesR/${TRAIT}_${CV}_${MODEL} -numit 100000 -burnin 2000 -n $PHENOCOL -seed 333
 
 software/bayesR/bin/bayesR -bfile tmp/${POP}_${TRAIT}_testing_${CV} -out $DIR/bayesR/${TRAIT}_${CV}_${MODEL}.2 -predict -model $DIR/bayesR/${TRAIT}_${CV}_${MODEL}.model -freq $DIR/bayesR/${TRAIT}_${CV}_${MODEL}.frq -param $DIR/bayesR/${TRAIT}_${CV}_${MODEL}.param
 #rm tmp/${BFILE}_${MODEL}.{fam,bed,bim}
