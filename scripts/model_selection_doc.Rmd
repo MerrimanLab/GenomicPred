@@ -1,0 +1,54 @@
+---
+title: "Untitled"
+author: "Murray Cadzow"
+date: "11/11/2019"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```
+# GCTA dir
+parallel 'cat {} |tr -s " " | tr " " "\t" > {}.tsv' ::: *hsq
+```
+
+
+```{r}
+hsq_files <- list.files(path = "results/nph_HEIGHT/GCTA/", pattern = "*.hsq.tsv", full.names = TRUE)
+hsq <- purrr::map(hsq_files, read_tsv) %>% set_names(str_remove_all(hsq_files, "results/nph_HEIGHT/GCTA//"))
+```
+
+
+compare h2 with lowest lowest SE and significant P
+```{r}
+gcta_extract <- function(hsq_df, name){
+  Pval = hsq_df %>% filter(Source == "Pval") %>% pull(Variance)
+  h2_var = hsq_df %>% filter(Source == "V(G)/Vp") %>% pull(Variance)
+  h2_se = hsq_df %>% filter(Source == "V(G)/Vp") %>% pull(SE)
+  return(tibble("file" = name,"pval" = Pval, "h2_var" = h2_var, "h2_se" = h2_se))
+}
+
+gcta_models <- purrr::map_dfr(names(hsq), ~gcta_extract(hsq[[.x]], .x ))
+
+gcta_models <- gcta_models %>% mutate(significant = ifelse(pval < 0.05, TRUE, FALSE),
+                                      cv = str_extract(file, "cv[1-5]"),
+                                      model_n = str_extract(file, "_([0-9])+") %>% str_remove_all("_") %>% as.numeric()) 
+
+gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = significant)) + geom_point() + ggtitle("significant models") + coord_cartesian(ylim = c(0,1), xlim = c(0,1))
+
+
+
+gcta_models %>% filter(max(h2_var)== h2_va
+```
+
+```{r}
+gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = factor(model_n))) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~cv)
+```
+
+```{r}
+gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) + theme_bw()
+```
+
