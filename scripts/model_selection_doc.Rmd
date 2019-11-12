@@ -5,19 +5,23 @@ date: "11/11/2019"
 output: html_document
 ---
 
-```{r}
+```{r setup}
 library(tidyverse)
 library(here)
+ggplot2::theme_set(theme_bw())
 ```
 
+
+### GCTA
 ```
 # GCTA dir
 parallel 'cat {} |tr -s " " | tr " " "\t" > {}.tsv' ::: *hsq
 ```
 
 
-```{r}
-hsq_files <- list.files(path = "results/nph_HEIGHT/GCTA/", pattern = "*.hsq.tsv", full.names = TRUE)
+```{r, warning = FALSE, message = FALSE}
+# this will cause warning messages because the files essentially are missing the last column in the bottom rows
+hsq_files <- fs::dir_ls(path = here("results/nph_HEIGHT/GCTA"), glob = "*.hsq.tsv")
 hsq <- purrr::map(hsq_files, read_tsv) %>% set_names(str_remove_all(hsq_files, "results/nph_HEIGHT/GCTA//"))
 ```
 
@@ -41,7 +45,7 @@ gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = significant)) + geom_
 
 
 
-gcta_models %>% filter(max(h2_var)== h2_va
+gcta_models %>% filter(max(h2_var)== h2_var)
 ```
 
 ```{r}
@@ -49,6 +53,46 @@ gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = factor(model_n))) + g
 ```
 
 ```{r}
-gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) + theme_bw()
+gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) 
 ```
 
+### LDAK
+
+```
+parallel 'grep "^Her\|^Com" {} > {}.h2' ::: *.reml
+parallel 'grep "^LRT_P" {} > {}.p' ::: *.reml
+```
+
+
+```{r, warning = FALSE, message = FALSE}
+ldak_files <- fs::dir_ls(path = here("results/nph_HEIGHT/LDAK"), glob = "*.reml.h2")
+ldak <- purrr::map(ldak_files, read_delim, delim = ' ') %>% set_names(str_remove_all(ldak_files, here("results/nph_HEIGHT/LDAK/")))
+
+ldak_p_files <- fs::dir_ls(path = here("results/nph_HEIGHT/LDAK"), glob = "*.p")
+ldak_p <- purrr::map(ldak_p_files, ~ read_delim(.x, delim = " ", col_names = c("stat", "lrt_p"))) %>% 
+  set_names(str_remove_all(ldak_p_files, here("results/nph_HEIGHT/LDAK/")))
+
+ldak <- purrr::map_dfr(names(ldak), ~ ldak[[.x]] %>% mutate(file = str_remove(.x, ".h2")))
+ldak_p <- purrr::map_dfr(names(ldak_p), ~ ldak_p[[.x]] %>% mutate(file = str_remove(.x, ".p")) %>% select(-stat))
+
+ldak_models <- ldak %>% left_join(ldak_p, by = "file") %>% 
+  filter(Component == "Her_ALL") %>% 
+  rename(h2_var = Heritability, h2_sd = Her_SD) %>% 
+  mutate(cv = str_extract(file, "cv[1-5]"), 
+         model_n = str_extract(file, "_([0-9])+") %>% str_remove("_") %>% as.numeric(),
+         significant = ifelse(lrt_p < 0.05, TRUE, FALSE)
+         )
+```
+
+
+```{r}
+ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = significant)) + geom_point() + ggtitle("significant models") + coord_cartesian(xlim = c(0,1)) 
+```
+
+```{r}
+ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = factor(model_n))) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~cv)
+```
+
+```{r}
+ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) 
+```
