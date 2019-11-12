@@ -27,8 +27,12 @@ software/gcta64 --reml --reml-pred-rand --grm results/${POP}_gcta_grm --pheno tm
 #software/plink1.9b6.10 --bfile data/data --keep tmp/$BFILE --maf 0.01 --geno 0.05 --make-bed --out tmp/$BFILE
 software/gcta64 --bfile tmp/$BFILE --blup-snp $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.indi.blp --autosome --out $DIR/GCTA/${TRAIT}_${CV}_${MODEL}
 
+cat  ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}.hsq |tr -s " " | tr " " "\t" > ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}.hsq.tsv
+
+
 # Then use plink --score $DIR/GCTA/height1.snp.blp 1 2 3 to do the prediction on the test set, ie bfile for the test set
 software/plink1.9b6.10 --bfile data/data --keep tmp/${POP}_${TRAIT}_testing_${CV} --make-bed --out tmp/${POP}_${TRAIT}_testing_${CV}
 software/plink1.9b6.10 --bfile tmp/${POP}_${TRAIT}_testing_${CV} --score $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.snp.blp 1 2 3 --out $DIR/GCTA/${TRAIT}_testing_${CV}_${MODEL}
+
 
 

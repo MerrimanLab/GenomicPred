@@ -18,6 +18,11 @@ software/plink1.9b6.10 --bfile data/data --keep tmp/${POP}_${TRAIT}_testing_${CV
 software/LDAK/ldak5.linux --calc-blups $DIR/LDAK/${TRAIT}_${CV}_${MODEL} --remlfile $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.reml --grm results/ldak_kinships --bfile tmp/${TEST} --check-root NO
 
 
+## make better results files
+grep "^Her\|^Com"  $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.reml  >  $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.h2
+grep "^LRT_P"  $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.reml > $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.p 
+
+
 ### needs an apply step to the testing set
 #software/plink1.9b6.10 --bfile data/data --keep tmp/${POP}_${TRAIT}_testing_${CV} --make-bed --out tmp/${TEST}
 #software/LDAK/ldak5.linux --calc-blups $DIR/LDAK/${TRAIT}_${CV}_${MODEL} --remlfile $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.reml --grm $DIR/LDAK/${TRAIT}_${CV}_kinships --bfile tmp/${TEST} 
