@@ -19,13 +19,13 @@ echo "****** $REGRESSION ******"
 
 #reml
 # $(seq 1 to how many trait/residual columns 
-software/gcta64 --reml --reml-pred-rand --grm results/${POP}_gcta_grm --pheno tmp/${BFILE}.pheno --mpheno ${PHENOCOL} --out ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}
+software/gcta64 --reml --reml-pred-rand --grm results/${POP}_gcta_grm --pheno tmp/${BFILE}.pheno --mpheno ${PHENOCOL} --out ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL} --threads 4
 
 
 
 # BLUP solutions for the SNP effects
 #software/plink1.9b6.10 --bfile data/data --keep tmp/$BFILE --maf 0.01 --geno 0.05 --make-bed --out tmp/$BFILE
-software/gcta64 --bfile tmp/$BFILE --blup-snp $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.indi.blp --autosome --out $DIR/GCTA/${TRAIT}_${CV}_${MODEL}
+software/gcta64 --bfile tmp/$BFILE --blup-snp $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.indi.blp --autosome --out $DIR/GCTA/${TRAIT}_${CV}_${MODEL} --threads 4
 
 cat  ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}.hsq |tr -s " " | tr " " "\t" > ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}.hsq.tsv
 
