@@ -1,9 +1,16 @@
+
+## Run:
+## bash scripts/cv_pipeline.sh data/data
+## 
+
+ORIG_DATA=$1
+
 echo "START"
 date
 mkdir -p tmp results
-
+software/plink1.9b6.10 --bfile ${ORIG_DATA} --make-bed --out tmp/data_sorted
 # create lise of independent SNPs from data
-software/plink1.9b6.10 --bfile data/data --indep-pairwise 50 5 0.2 --maf 0.1 --out data/data_pca_markers
+software/plink1.9b6.10 --bfile tmp/data_sorted --indep-pairwise 50 5 0.2 --maf 0.1 --out tmp/data_pca_markers
 
 # create the PCAs for the pops of interest
 parallel 'bash scripts/generate_pop_pca.sh {}' ::: nph east west euro 
@@ -43,9 +50,8 @@ parallel 'bash scripts/training_subset.sh {}' ::: $(ls tmp/*_training_cv* | grep
 
 # calculate the column indexs from all of the residuals -> should be equal to $(seq 1 number_of_models)
 pheno_cols=$(for cv_residuals in tmp/*residuals.txt; do  head -1 $cv_residuals | awk '{ for(i=1;i<=NF-2;i++){print i}}' ; done | sort -u)
-echo 32 > cpus
+echo 16 > cpus
 parallel -j cpus 'nice -n 10 bash scripts/run_gcta.sh {1} {2}' ::: $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols} 
-bash scripts/ldak_weights.sh 
 parallel -j cpus 'nice -n 10 bash scripts/run_ldak.sh {1} {2} ' :::  $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols}
 parallel -j cpus 'nice -n 10 bash scripts/run_bayesR.sh {1} {2} ' ::: $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols}
 
