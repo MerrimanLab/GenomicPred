@@ -31,8 +31,8 @@ cat  ${DIR}/GCTA/${TRAIT}_${CV}_${MODEL}.hsq |tr -s " " | tr " " "\t" > ${DIR}/G
 
 
 # Then use plink --score $DIR/GCTA/height1.snp.blp 1 2 3 to do the prediction on the test set, ie bfile for the test set
-software/plink1.9b6.10 --bfile data/data --keep tmp/${POP}_${TRAIT}_testing_${CV} --make-bed --out tmp/${POP}_${TRAIT}_testing_${CV}
-software/plink1.9b6.10 --bfile tmp/${POP}_${TRAIT}_testing_${CV} --score $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.snp.blp 1 2 3 --out $DIR/GCTA/${TRAIT}_testing_${CV}_${MODEL}
+software/plink1.9b6.10 --bfile data/data --keep tmp/${TEST} --make-bed --out tmp/${TEST}
+software/plink1.9b6.10 --bfile tmp/${TEST} --score $DIR/GCTA/${TRAIT}_${CV}_${MODEL}.snp.blp 1 2 3 --out $DIR/GCTA/${TRAIT}_testing_${CV}_${MODEL}
 
 
 

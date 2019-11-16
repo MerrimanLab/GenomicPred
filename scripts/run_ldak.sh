@@ -24,3 +24,8 @@ grep "^LRT_P"  $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.reml > $DIR/LDAK/${TRAIT}_${CV}
 
 ### needs an apply step to the testing set
 software/plink1.9b6.10 --bfile tmp/${POP}_sorteddata --keep tmp/${POP}_${TRAIT}_testing_${CV} --make-bed --out tmp/${TEST}
+
+# might not be correct:
+# --score 1 2 4 is refering to the marker name, A1 and center
+# unsure if the correct columns are being used
+software/plink1.9b6.10 --bfile tmp/${TEST} --score $DIR/LDAK/${TRAIT}_${CV}_${MODEL}.blup 1 2 4 --out $DIR/LDAK/${TRAIT}_testing_${CV}_${MODEL}
