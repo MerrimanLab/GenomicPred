@@ -3,12 +3,28 @@ title: "Untitled"
 author: "Murray Cadzow"
 date: "11/11/2019"
 output: html_document
+params:
+  pop: "nph"
+  trait: "HEIGHT"
 ---
 
 ```{r setup}
 library(tidyverse)
 library(here)
 ggplot2::theme_set(theme_bw())
+
+if(params$trait != ""){
+  trait <- params$trait
+} else {
+    #trait <- 'HEIGHT' # default test case
+}
+
+if(params$pop != ""){
+  pop <- params$pop
+} else {
+  #pop <- 'nph'
+}
+
 ```
 
 
@@ -21,8 +37,8 @@ parallel 'cat {} |tr -s " " | tr " " "\t" > {}.tsv' ::: *hsq
 
 ```{r, warning = FALSE, message = FALSE}
 # this will cause warning messages because the files essentially are missing the last column in the bottom rows
-hsq_files <- fs::dir_ls(path = here("results/nph_HEIGHT/GCTA"), glob = "*.hsq.tsv")
-hsq <- purrr::map(hsq_files, read_tsv) %>% set_names(str_remove_all(hsq_files, "results/nph_HEIGHT/GCTA//"))
+hsq_files <- fs::dir_ls(path = here("results/",paste0(pop,"_",trait),"GCTA"), glob = "*.hsq.tsv")
+hsq <- purrr::map(hsq_files, read_tsv) %>% set_names(str_remove_all(hsq_files, here(paste0("results/",pop,"_",trait,"/GCTA//"))))
 ```
 
 
@@ -65,12 +81,12 @@ parallel 'grep "^LRT_P" {} > {}.p' ::: *.reml
 
 
 ```{r, warning = FALSE, message = FALSE}
-ldak_files <- fs::dir_ls(path = here("results/nph_HEIGHT/LDAK"), glob = "*.reml.h2")
-ldak <- purrr::map(ldak_files, read_delim, delim = ' ') %>% set_names(str_remove_all(ldak_files, here("results/nph_HEIGHT/LDAK/")))
+ldak_files <- fs::dir_ls(path = here("results/",paste0(pop,"_",trait),"/LDAK"), glob = "*.reml.h2")
+ldak <- purrr::map(ldak_files, read_delim, delim = ' ') %>% set_names(str_remove_all(ldak_files, here(paste0("results/",pop,"_",trait,"/LDAK/"))))
 
-ldak_p_files <- fs::dir_ls(path = here("results/nph_HEIGHT/LDAK"), glob = "*.p")
+ldak_p_files <- fs::dir_ls(path = here(paste0("results/",pop,"_",trait,"/LDAK")), glob = "*.p")
 ldak_p <- purrr::map(ldak_p_files, ~ read_delim(.x, delim = " ", col_names = c("stat", "lrt_p"))) %>% 
-  set_names(str_remove_all(ldak_p_files, here("results/nph_HEIGHT/LDAK/")))
+  set_names(str_remove_all(ldak_p_files, here(paste0("results/",pop,"_",trait,"/LDAK/"))))
 
 ldak <- purrr::map_dfr(names(ldak), ~ ldak[[.x]] %>% mutate(file = str_remove(.x, ".h2")))
 ldak_p <- purrr::map_dfr(names(ldak_p), ~ ldak_p[[.x]] %>% mutate(file = str_remove(.x, ".p")) %>% select(-stat))
@@ -96,3 +112,7 @@ ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = factor(model_n))) + g
 ```{r}
 ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) 
 ```
+
+
+## BayesR
+
