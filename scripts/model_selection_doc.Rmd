@@ -1,30 +1,26 @@
 ---
-title: "Untitled"
-author: "Murray Cadzow"
-date: "11/11/2019"
 output: html_document
+
 params:
   pop: "nph"
   trait: "HEIGHT"
+  author: "Murray Cadzow"
+
+title: "`r paste('Report for population:',params$pop, 'and trait:',params$trait)`"
+author: "`r params$author`"
+date: "`r format(Sys.Date())`"
+
 ---
+
+
 
 ```{r setup}
 library(tidyverse)
 library(here)
 ggplot2::theme_set(theme_bw())
 
-if(params$trait != ""){
-  trait <- params$trait
-} else {
-    #trait <- 'HEIGHT' # default test case
-}
-
-if(params$pop != ""){
-  pop <- params$pop
-} else {
-  #pop <- 'nph'
-}
-
+pop <- params$pop
+trait<- params$trait
 ```
 
 
