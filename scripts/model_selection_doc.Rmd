@@ -1,12 +1,15 @@
 ---
-output: html_document
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
 
 params:
   pop: "nph"
   trait: "HEIGHT"
   author: "Murray Cadzow"
 
-title: "`r paste('Report for population:',params$pop, 'and trait:',params$trait)`"
+title: "`r paste('Report:',params$pop, 'and',params$trait)`"
 author: "`r params$author`"
 date: "`r format(Sys.Date())`"
 
@@ -24,7 +27,7 @@ trait<- params$trait
 ```
 
 
-### GCTA
+## GCTA
 ```
 # GCTA dir
 parallel 'cat {} |tr -s " " | tr " " "\t" > {}.tsv' ::: *hsq
@@ -68,7 +71,7 @@ gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = factor(model_n))) + g
 gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) 
 ```
 
-### LDAK
+## LDAK
 
 ```
 parallel 'grep "^Her\|^Com" {} > {}.h2' ::: *.reml
