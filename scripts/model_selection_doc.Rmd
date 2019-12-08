@@ -115,3 +115,16 @@ ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = cv)) + geom_point() +
 
 ## BayesR
 
+## Models
+
+```{r}
+model_results <- readRDS("../results/nph_HEIGHT/nph_HEIGHT.RDS")
+```
+
+```{r}
+cv_models <- pluck(model_results, "cv_results")
+map_at(cv_models, .at = 3,"model"  ) %>% pluck("model")
+
+plot(model_results$cv_results$cv1$model1$model)
+```
+

@@ -1,7 +1,7 @@
 library(tidyverse)
 library(here)
 
-traits <- read_csv(here("data/pop_trait_models.csv"), col_names = c("trait", "model_type"))
+traits <- read_csv(here("data/pop_trait_models.csv"), col_names = c("trait", "model_type")) %>% filter(!str_detect(trait,"#"))
 
 
 pops <- tibble(pop = c("nph", "east","west","euro"))
