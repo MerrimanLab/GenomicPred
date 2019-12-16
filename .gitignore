@@ -6,3 +6,4 @@ results/
 .Rproj.user
 *.log
 scripts/*html
+.Rhistory
