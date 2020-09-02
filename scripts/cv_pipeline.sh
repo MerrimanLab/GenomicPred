@@ -54,7 +54,7 @@ echo 16 > cpus
 parallel -j cpus 'nice -n 10 bash scripts/run_gcta.sh {1} {2}' ::: $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols} 
 echo 32 > cpus
 parallel -j cpus 'nice -n 10 bash scripts/run_ldak.sh {1} {2} ' :::  $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols}
-parallel -j cpus 'nice -n 10 bash scripts/run_bayesR.sh {1} {2} ' ::: $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols}
+#parallel -j cpus 'nice -n 10 bash scripts/run_bayesR.sh {1} {2} ' ::: $(ls tmp/*training_cv*.fam | grep 'cv[0-9]\+.fam') ::: ${pheno_cols}
 
 echo "FINISH"
 date
