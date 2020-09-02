@@ -118,7 +118,7 @@ ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = cv)) + geom_point() +
 ## Models
 
 ```{r}
-model_results <- readRDS("../results/nph_HEIGHT/nph_HEIGHT.RDS")
+model_results <- readRDS(here(paste0("results/",pop,"_",trait,"/",pop, "_",trait,".RDS")))
 ```
 
 ```{r}
