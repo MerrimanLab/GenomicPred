@@ -71,6 +71,14 @@ gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = factor(model_n))) + g
 gcta_models %>% ggplot(aes(x = h2_se, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) 
 ```
 
+
+### GCTA Tables
+
+```{r}
+gcta_models %>% knitr::kable()
+```
+
+
 ## LDAK
 
 ```
@@ -100,6 +108,9 @@ ldak_models <- ldak %>% left_join(ldak_p, by = "file") %>%
 ```
 
 
+
+
+
 ```{r}
 ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = significant)) + geom_point() + ggtitle("significant models") + coord_cartesian(xlim = c(0,1)) 
 ```
@@ -112,6 +123,12 @@ ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = factor(model_n))) + g
 ldak_models %>% ggplot(aes(x = h2_sd, y = h2_var, colour = cv)) + geom_point() + ggtitle("Coloured by Model") + coord_cartesian(ylim = c(0,1), xlim = c(0,1)) + facet_wrap(~model_n) 
 ```
 
+
+### LDAK Tables
+
+```{r}
+ldak_models %>% knitr::kable()
+```
 
 ## BayesR
 
