@@ -28,7 +28,7 @@ software/LDAK/ldak5.linux --reml ${POP}_results/LDAK/${TRAIT}_${MODEL} --pheno t
 
 ### blups
 
-software/LDAK/ldak5.linux --calc-blups ${POP}_results/LDAK/${TRAIT}_${MODEL} --remlfile ${POP}_results/LDAK/${TRAIT}_${CV}_${MODEL}.reml --grm results/${POP}_ldak_kinships --bfile tmp/${BFILE} --check-root NO
+software/LDAK/ldak5.linux --calc-blups ${POP}_results/LDAK/${TRAIT}_${MODEL} --remlfile ${POP}_results/LDAK/${TRAIT}_${MODEL}.reml --grm results/${POP}_ldak_kinships --bfile tmp/${BFILE} --check-root NO
 
 
 

@@ -125,7 +125,7 @@ new_dat %>%
   select(SUBJECT, !!trait) %>% # pull out ids and trait column
   slice(-unlist(model_remove)) %>% # remove rows that didn't have residuals
   bind_cols(model_residuals) %>% 
-  write_delim(path = here("tmp",paste0(pop,"_",trait,".residuals.txt")),
+  write_delim(file = here("tmp",paste0(pop,"_",trait,".residuals.txt")),
               delim = " ",
               col_names = FALSE)
 

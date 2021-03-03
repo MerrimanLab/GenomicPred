@@ -59,6 +59,6 @@ software/gcta64 --bfile tmp/$BFILE --blup-snp ${POP}_results/GCTA/${TRAIT}_${MOD
 
 
 
-cat  ${POP}_results/GCTA/${TRAIT}_${MODEL}.hsq |tr -s " " | tr " " "\t" > ${DIR}/GCTA/${TRAIT}_${MODEL}.hsq.tsv
+cat  ${POP}_results/GCTA/${TRAIT}_${MODEL}.hsq |tr -s " " | tr " " "\t" > ${POP}_results/GCTA/${TRAIT}_${MODEL}.hsq.tsv
 
 
