@@ -54,6 +54,7 @@ software/gcta64 --bfile tmp/${POP}_sorteddata --autosome --make-grm --out ${RESU
 
 ####################### LDAK
 
+echo "Start LDAK $(date)"
 ### calculate the weights and kinships for LDAK prior to GRM
  software/LDAK/ldak5.linux --cut-weights ${RESULTS}/${POP}_ldak_sections --bfile tmp/${POP}_sorteddata
 
@@ -63,13 +64,15 @@ software/gcta64 --bfile tmp/${POP}_sorteddata --autosome --make-grm --out ${RESU
 
 software/LDAK/ldak5.linux --calc-kins-direct ${RESULTS}/${POP}_ldak_kinships --bfile  tmp/${POP}_sorteddata --weights ${RESULTS}/${POP}_ldak_sections/weights.short --power -0.25
 
-
+echo "Start traits $(date)"
 # example line to use for testing one iteration
 #line="HEIGHT,linear",
 while read line
 do
 	TRAIT=$(echo $line | cut -d',' -f1)
 	REGRESSION_TYPE=$(echo $line | cut -d',' -f2)
+
+	echo "Start ${TRAIT} $(date)"
 	mkdir -p ${RESULTS}/{GCTA,LDAK}
 	##### Generate regression residuals for each model #####
 	# makes tmp/${POP}_${TRAIT}_residuals.txt
