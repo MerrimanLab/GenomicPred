@@ -58,10 +58,12 @@ if(is.null(opt$pop)){
   pop <- opt$pop
 }
 
-pop <- 'nph'
-model_type <- "linear"
-trait <- "HEIGHT"
-opt <-list(out_dir = "nph_results/")
+
+## Used for testing inside of an interactive session
+#pop <- 'nph'
+#model_type <- "linear"
+#trait <- "HEIGHT"
+#opt <-list(out_dir = "nph_results/")
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE) %>% mutate(GOUT01recode = GOUT -1, T2D01recode = T2D -1, logBMI= log(BMI))
 newpca <- read_delim(file = here("results",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)), col_types = paste0(c("c","c",rep("d", 10)),collapse = ""))
@@ -130,7 +132,7 @@ new_dat %>%
               col_names = FALSE)
 
   
-  
+message(paste("residuals file:", here("tmp",paste0(pop,"_",trait,".residuals.txt")))) 
 
 
 
