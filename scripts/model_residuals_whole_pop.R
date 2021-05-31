@@ -66,7 +66,7 @@ if(is.null(opt$pop)){
 #opt <-list(out_dir = "nph_results/")
 
 all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE) %>% mutate(GOUT01recode = GOUT -1, T2D01recode = T2D -1, logBMI= log(BMI))
-newpca <- read_delim(file = here("results",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)), col_types = paste0(c("c","c",rep("d", 10)),collapse = ""))
+newpca <- read_delim(file = here(paste0(pop,"_results"),paste0(pop,"_pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)), col_types = paste0(c("c","c",rep("d", 10)),collapse = ""))
 
 if (!trait %in% names(all_dat)){
   stop("Trait argument supplied does not match a column in the phenotypes.", call.=FALSE)
@@ -127,12 +127,12 @@ new_dat %>%
   select(SUBJECT, !!trait) %>% # pull out ids and trait column
   slice(-unlist(model_remove)) %>% # remove rows that didn't have residuals
   bind_cols(model_residuals) %>% 
-  write_delim(file = here("tmp",paste0(pop,"_",trait,".residuals.txt")),
+  write_delim(file = here(opt$out_dir,paste0(pop,"_",trait,".residuals.txt")),
               delim = " ",
               col_names = FALSE)
 
   
-message(paste("residuals file:", here("tmp",paste0(pop,"_",trait,".residuals.txt")))) 
+message(paste("residuals file:", here(opt$out_dir,paste0(pop,"_",trait,".residuals.txt")))) 
 
 
 
