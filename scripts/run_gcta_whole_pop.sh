@@ -15,7 +15,7 @@ MODEL=$2
 
 # pulls out the from the start of the residuals - first 7 cols are: FID IID PID MID SEX AFF TRUEPHENOVALUE
 PHENOCOL=$(echo $MODEL + 7 | bc)
-
+cut -d' ' -f1,2,${PHENOCOL} < ${RESULTS}/${BFILE}.pheno > ${RESULTS}/${BFILE}.pheno${MODEL}_gcta
 
 
 
@@ -45,8 +45,8 @@ echo "****** $REGRESSION ******"
 #reml
 
 # $(seq 1 to how many trait/residual columns 
-cut -d' ' -f1,2,${PHENOCOL} < ${RESULTS}/${BFILE}.pheno > ${RESULTS}/${BFILE}.pheno${MODEL}
-software/gcta64 --reml --reml-pred-rand --grm ${RESULTS}/${POP}_gcta_grm --pheno ${RESULTS}/${BFILE}.pheno${MODEL} --out ${RESULTS}/GCTA/${TRAIT}_${MODEL} --threads 4
+
+software/gcta64 --reml --reml-pred-rand --grm ${RESULTS}/${POP}_gcta_grm --pheno ${RESULTS}/${BFILE}.pheno${MODEL}_gcta --out ${RESULTS}/GCTA/${TRAIT}_${MODEL} --threads 4
 
 
 
