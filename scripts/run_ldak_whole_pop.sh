@@ -14,14 +14,14 @@ TRAIT=$(echo $BFILE | cut -d'_' -f2)
 MODEL=$2
 
 PHENOCOL=$(echo $MODEL + 4 | bc) # ignore the first 4 columns after FID and IID
-
+cut -d' ' -f1,2,${PHENOCOL} <  ${RESULTS}/${BFILE}.pheno >  ${RESULTS}/${BFILE}.pheno${MODEL}_ldak
 
 
 ####################### LDAK 
 
 ### reml
 
-software/LDAK/ldak5.linux --reml ${RESULTS}/LDAK/${TRAIT}_${MODEL} --pheno ${RESULTS}/${BFILE}.pheno --mpheno ${PHENOCOL} --grm ${RESULTS}/${POP}_ldak_kinships
+software/LDAK/ldak5.linux --reml ${RESULTS}/LDAK/${TRAIT}_${MODEL} --pheno ${RESULTS}/${BFILE}.pheno${MODEL}_ldak  --grm ${RESULTS}/${POP}_ldak_kinships
 
 
 

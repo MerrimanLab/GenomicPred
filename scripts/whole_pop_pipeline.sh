@@ -90,9 +90,9 @@ do
 	# columns 8-12 are the FIVE residuals
 	# height, egfr, serumurate, diabetes and gout in that order
 	# need to join based on number fo models 2.2 - 2.8  was for 7 models
-	software/plink1.9b6.10 --bfile data/data --keep data/${POP}.keep --make-bed --out tmp/${POP}_${TRAIT}
+	software/plink1.9b6.10 --bfile data/data --keep data/${POP}.keep --make-bed --maf 0.01 --geno 0.05 --out tmp/${POP}_${TRAIT}
 	# this should join using IID from fam and IID from the pheno (in pheno first and second cols are duplicated) includes entire fam in output so need to adjust accordingly for model numbers (-6 cols)
-	join -1 2 -2 1 -o auto -e "NA" <(sort -k1 tmp/${POP}_${TRAIT}.fam) <(sort -k1 ${RESULTS}/${POP}_${TRAIT}.residuals.txt | cut -f2- )  > ${RESULTS}/${POP}_${TRAIT}.pheno 
+	join -1 2 -2 1 -o auto -e "NA" <(sort -k2 tmp/${POP}_${TRAIT}.fam) <(sort -k1 ${RESULTS}/${POP}_${TRAIT}.residuals.txt)  > ${RESULTS}/${POP}_${TRAIT}.pheno 
 
 	# calculate the column indexes, offset by 2 (to account for FID and IID) from all of the residuals -> should be equal to $(seq 1 number_of_models)
 	pheno_cols=$( head -1 ${RESULTS}/${POP}_${TRAIT}.residuals.txt | awk '{ for(i=1;i<=NF-2;i++){print i}}' | sort -u)	
