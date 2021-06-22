@@ -104,9 +104,14 @@ do
 
 	#### LDAK for each model of current trait
 	parallel -j 16 'nice -n 10 bash scripts/run_ldak_whole_pop.sh {1} {2} ' :::  tmp/${POP}_${TRAIT}.fam  ::: ${pheno_cols} 
-
 done < data/pop_trait_models.csv
 
+WD=$(pwd)
+cd ${RESULTS}/LDAK
+# combine all LDAK h2 for pop into a single file
+grep 'K1' *.h2 | cat <(echo FILE $(head -1 ${TRAIT}_1.h2 )) - > ${POP}_all_traits_LDAK_K1_h2.txt
+# return to the orignal directory
+cd $WD
 
 
 
