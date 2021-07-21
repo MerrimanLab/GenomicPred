@@ -3,7 +3,7 @@ POP=nphpca
 RESULTS=${POP}_results
 TRAIT=gout
 mkdir -p ${RESULTS}/{LDAK,GCTA}/${TRAIT}
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
 
  MODEL=$(basename ${covar} .covar)
@@ -15,7 +15,7 @@ do
 done > ${POP}_${TRAIT}.log
 
 TRAIT=t2d
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
  MODEL=$(basename ${covar} .covar)
  PREV=0.078
@@ -31,7 +31,7 @@ POP=eastpca
 RESULTS=${POP}_results
 TRAIT=gout
 mkdir -p ${RESULTS}/{LDAK,GCTA}/${TRAIT}
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
  MODEL=$(basename ${covar} .covar)
  PREV=0.043
@@ -42,7 +42,7 @@ do
 done > ${POP}_${TRAIT}.log
 
 TRAIT=t2d
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
  MODEL=$(basename ${covar} .covar)
  PREV=0.084
@@ -52,12 +52,12 @@ do
 done > ${POP}_${TRAIT}.log
 
 ## West
-
+echo WEST
 POP=westpca
 RESULTS=${POP}_results
 TRAIT=gout
 mkdir -p ${RESULTS}/{LDAK,GCTA}/${TRAIT}
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
  MODEL=$(basename ${covar} .covar)
  PREV=0.051
@@ -68,7 +68,7 @@ do
 done > ${POP}_${TRAIT}.log
 
 TRAIT=t2d
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
 
  MODEL=$(basename ${covar} .covar)
@@ -81,12 +81,12 @@ done > ${POP}_${TRAIT}.log
 
 ## Euro
 
-
+echo EURO
 POP=europca
 RESULTS=${POP}_results
 TRAIT=gout
 mkdir -p ${RESULTS}/{LDAK,GCTA}/${TRAIT}
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
  MODEL=$(basename ${covar} .covar)
  PREV=0.024
@@ -97,7 +97,7 @@ do
 done > ${POP}_${TRAIT}.log
 
 TRAIT=t2d
-for covar in ls ${RESULTS}/*.covar
+for covar in {ls ${RESULTS}/*.covar}
 do
  MODEL=$(basename ${covar} .covar)
  PREV=0.049
