@@ -32,7 +32,7 @@ p1 <- pops %>% ggplot(aes(x = PCA2, y = PCA3, colour = pop)) + geom_point() +
   geom_hline(yintercept = 0.0025, colour = "red", linetype = "dashed") +
   geom_vline(xintercept = 0, colour = 'red', linetype = "dashed")
 
-
+## 19 July 2021 Re-run NPH again
 new_nph <- pops %>% filter(pop == "nph" & PCA2 > 0 & PCA3 > 0.0025) %>%
   select(X1,X2) %>% write_delim(file = here("data/nphpca.keep"),
                                 delim = "\t",

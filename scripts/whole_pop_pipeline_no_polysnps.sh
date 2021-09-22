@@ -26,15 +26,21 @@ date
 mkdir -p tmp ${RESULTS}/
 
 
-software/plink1.9b6.10 --bfile ${ORIG_DATA} --make-bed --out tmp/data_sorted
+software/plink1.9b6.10 --bfile ${ORIG_DATA} --geno 0.05 --make-bed --out tmp/data_sorted
 
+# No need to add in Poly Snps right now.
+# software/plink1.9b6.10 --bfile tmp/data_sorted --missing-genotype . --merge data/PolySNPS --make-bed --out tmp/dataPolySNPS --allow-no-sex
 
 ## sort and keep our population
-software/plink1.9b6.10 --bfile tmp/data_sorted --keep data/${POP}.keep --maf 0.01 --geno 0.05 --make-bed --out tmp/${POP}_sorteddata
+software/plink1.9b6.10 --bfile tmp/data_sorted --keep data/${POP}.keep --maf 0.01  --make-bed --out tmp/${POP}_sorteddata
 
 
 # create list of population specific independent SNPs from data
 software/plink1.9b6.10 --bfile tmp/${POP}_sorteddata --indep-pairwise 50 5 0.2 --maf 0.1 --out ${RESULTS}/${POP}_pca_markers
+
+#(dont' need to do) :make sure the snps of interest don't get filtered out later on
+#echo RS373863828 >>${RESULTS}/${POP}_pca_markers.prune.in 
+#echo CETP_57004947 >> ${RESULTS}/${POP}_pca_markers.prune.in
 
 ######################## GCTA
 #grm
@@ -90,7 +96,7 @@ do
 	# columns 8-12 are the FIVE residuals
 	# height, egfr, serumurate, diabetes and gout in that order
 	# need to join based on number fo models 2.2 - 2.8  was for 7 models
-	software/plink1.9b6.10 --bfile ${ORIG_DATA} --keep data/${POP}.keep --make-bed --maf 0.01 --geno 0.05 --out tmp/${POP}_${TRAIT}
+	software/plink1.9b6.10 --bfile tmp/data_sorted --keep data/${POP}.keep --make-bed --maf 0.01 --out tmp/${POP}_${TRAIT}
 	# this should join using IID from fam and IID from the pheno (in pheno first and second cols are duplicated) includes entire fam in output so need to adjust accordingly for model numbers (-6 cols)
 	join -1 2 -2 1 -o auto -e "NA" <(sort -k2 tmp/${POP}_${TRAIT}.fam) <(sort -k1 ${RESULTS}/${POP}_${TRAIT}.residuals.txt)  > ${RESULTS}/${POP}_${TRAIT}.pheno 
 

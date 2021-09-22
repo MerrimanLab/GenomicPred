@@ -13,7 +13,7 @@ TRAIT=$(echo $BFILE | cut -d'_' -f2)
 
 MODEL=$2
 
-PHENOCOL=$(echo $MODEL + 4 | bc) # ignore the first 4 columns after FID and IID
+PHENOCOL=$(echo $MODEL + 7 | bc) # ignore the first 7 columns: FID IID MID PID SEX AFF TRUEPHENOVALUE
 cut -d' ' -f1,2,${PHENOCOL} <  ${RESULTS}/${BFILE}.pheno >  ${RESULTS}/${BFILE}.pheno${MODEL}_ldak
 
 

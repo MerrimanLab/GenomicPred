@@ -16,7 +16,7 @@ euro <- read_delim(here("europca_results/europca_pcafile.eigenvec"), col_names =
 
 all_IIDS <- c(nph$IID, east$IID, west$IID, euro$IID)
 
-tanya <- tanya %>% filter(SUBECT %in% all_IIDS)
+tanya <- tanya %>% filter(SUBJECT %in% all_IIDS)
 
 tanya %>% select(IID = SUBJECT, GOUT) %>%
   mutate(GOUT_recode = case_when(str_detect(GOUT,"Control") ~ 1,

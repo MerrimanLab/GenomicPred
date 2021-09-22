@@ -19,7 +19,7 @@ parallel 'bash scripts/generate_pop_pca.sh {}' ::: nph east west euro
 # create the cv splits and residuals for all pops and trait combos
 
 # ****  traits must not contain underscores in their names ****
-CV=5 # number fo folds for cross validation
+CV=2 # number fo folds for cross validation
 
 for POP in nph east west euro 
 do
