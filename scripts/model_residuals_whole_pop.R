@@ -58,13 +58,15 @@ if(is.null(opt$pop)){
   pop <- opt$pop
 }
 
-pop <- 'nph'
-model_type <- "linear"
-trait <- "HEIGHT"
-opt <-list(out_dir = "nph_results/")
 
-all_dat <- read_csv(file = here("data/curated_data.csv"), col_names = TRUE) %>% mutate(GOUT01recode = GOUT -1, T2D01recode = T2D -1, logBMI= log(BMI))
-newpca <- read_delim(file = here("results",paste0(pop,"_","pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)), col_types = paste0(c("c","c",rep("d", 10)),collapse = ""))
+## Used for testing inside of an interactive session
+#pop <- 'nph'
+#model_type <- "linear"
+#trait <- "HEIGHT"
+#opt <-list(out_dir = "nph_results/")
+
+all_dat <- read_csv(file = here("data/tanya_data.csv"), col_names = TRUE) # %>% mutate(GOUT01recode = GOUT -1, T2D01recode = T2D -1, logBMI= log(BMI))
+newpca <- read_delim(file = here(paste0(pop,"_results"),paste0(pop,"_pcafile.eigenvec")), delim = " ", col_names = c("FID","SUBJECT",paste0("PC",1:10)), col_types = paste0(c("c","c",rep("d", 10)),collapse = ""))
 
 if (!trait %in% names(all_dat)){
   stop("Trait argument supplied does not match a column in the phenotypes.", call.=FALSE)
@@ -77,6 +79,9 @@ new_dat <- newpca %>% left_join(., all_dat, by = "SUBJECT")
 
 # Define list of variables for the models ####
 preds <- c("AGECOL", "SEX", paste0("PC",1:10))
+
+# subset the data to only include the variables needed to run the models and make it so that only individuals with complete observations are included
+new_dat <- new_dat %>% select(SUBJECT, !!trait, all_of(preds)) %>% drop_na()
 
 # generate models stepwise adding variables
 models <- list()
@@ -123,14 +128,14 @@ model_remove <-  map(model_results, list("model","na.action"))
 # write out residuals, columns: SUBJECT TRAIT model1 ... modelx
 new_dat %>% 
   select(SUBJECT, !!trait) %>% # pull out ids and trait column
-  slice(-unlist(model_remove)) %>% # remove rows that didn't have residuals
+  #slice(-unlist(model_remove)) %>% # remove rows that didn't have residuals (step no longer needed due to step before model creation that only lets complete obs go into the model)
   bind_cols(model_residuals) %>% 
-  write_delim(path = here("tmp",paste0(pop,"_",trait,".residuals.txt")),
+  write_delim(file = here(opt$out_dir,paste0(pop,"_",trait,".residuals.txt")),
               delim = " ",
               col_names = FALSE)
 
   
-  
+message(paste("residuals file:", here(opt$out_dir,paste0(pop,"_",trait,".residuals.txt")))) 
 
 
 
