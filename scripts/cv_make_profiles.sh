@@ -15,7 +15,7 @@ do
     MODEL=$(basename -s .snp.blp ${SNPBLUP} |  sed "s/${PHENO}_//g")
     TRAIN_DIR=$(echo ${SNPBLUP} | cut -d'/' -f1 )
     PREPOST=$(echo ${TRAIN_DIR} | sed 's/.*results_//g')
-    TRAIN=$(echo ${BLUP} | cut -d'/' -f1 | sed 's/_results.*//g')
+    TRAIN=$(echo ${SNPBLUP} | cut -d'/' -f1 | sed 's/_results.*//g')
     TEST=$(echo ${TRAIN} | sed 's/training/testing/g')
     TEST_DIR=$(echo ${TRAIN_DIR} | sed 's/training/testing/g')
     TEST_KEEPFILE="data/${TEST}.keep"
