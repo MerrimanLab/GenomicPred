@@ -1,3 +1,7 @@
+if(!require(textshaping)){
+  install.packages("here", repos = "https://cloud.r-project.org")
+  library("textshaping")
+}
 if(!require(here)){
   install.packages("here", repos = "https://cloud.r-project.org")
   library("here")
